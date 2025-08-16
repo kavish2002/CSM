@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon UK Job Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Amazon UK Job Tracker</h1>
+        <div class="summary">
+            <p><strong>Last Updated:</strong> {{ summary.run_time }}</p>
+            <p><strong>Total Active Jobs Tracked:</strong> {{ summary.total_jobs }}</p>
+            {% if summary.error %}
+                <p class="error"><strong>Status:</strong> {{ summary.error }}</p>
+            {% endif %}
+        </div>
+
+        {% if summary.added_jobs or summary.removed_jobs %}
+        <div class="changes">
+            {% if summary.added_jobs %}
+            <div class="new-jobs">
+                <h2>✅ New Jobs Found ({{ summary.added_jobs|length }})</h2>
+                <ul>
+                    {% for job in summary.added_jobs %}
+                    <li><a href="{{ job.url }}" target="_blank">{{ job.title }}</a> in {{ job.location }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if summary.removed_jobs %}
+            <div class="removed-jobs">
+                <h2>❌ Removed/Filled Jobs ({{ summary.removed_jobs|length }})</h2>
+                <ul>
+                    {% for job in summary.removed_jobs %}
+                    <li>{{ job.title }} in {{ job.location }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <h2>All Tracked Jobs</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Location</th>
+                        <th>Date Posted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in all_jobs %}
+                    <tr>
+                        <td><a href="{{ job.url }}" target="_blank">{{ job.title }}</a></td>
+                        <td>{{ job.location }}</td>
+                        <td>{{ job.posted_date }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3">No jobs found. Run the tracker script first.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
