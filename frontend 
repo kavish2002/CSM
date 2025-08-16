@@ -1,0 +1,41 @@
+# app.py
+
+from flask import Flask, render_template
+import csv
+import json
+import os
+
+app = Flask(__name__)
+
+# File paths
+CSV_FILE = 'tracked_amazon_uk_jobs.csv'
+SUMMARY_FILE = 'run_summary.json'
+
+@app.route('/')
+def index():
+    """Renders the main page with job data."""
+    
+    # Load all jobs from the CSV
+    all_jobs = []
+    if os.path.exists(CSV_FILE):
+        with open(CSV_FILE, mode='r', newline='', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            all_jobs = list(reader)
+    
+    # Load the summary data from the last run
+    summary = {
+        "run_time": "Never",
+        "total_jobs": 0,
+        "added_jobs": [],
+        "removed_jobs": [],
+        "error": "Tracker has not been run yet."
+    }
+    if os.path.exists(SUMMARY_FILE):
+        with open(SUMMARY_FILE, 'r', encoding='utf-8') as f:
+            summary = json.load(f)
+
+    return render_template('index.html', all_jobs=all_jobs, summary=summary)
+
+if __name__ == "__main__":
+    # Use debug=True for development, which provides auto-reloading
+    app.run(debug=True)
